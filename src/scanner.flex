@@ -42,17 +42,17 @@ SECONDS "0"|{NON_ZERO_DIGIT}{DIGIT}*
 
 
 %%
-{ENDLINE} { yylval.as_string = strdup(yytext); return TK_ENDLINE; }
+{ENDLINE} { return TK_ENDLINE; }
 {CITY_CODE} { yylval.as_string = strdup(yytext); return TK_CITY_CODE; }
-{CITY_NAME} { yylval.as_string = strdup(yytext); return TK_CITY_NAME; }
+{CITY_NAME} { yylval.as_string = strndup(yytext+1, yyleng-2); return TK_CITY_NAME; }
 {COORDINATES} { yylval.as_double = atof(yytext); return TK_COORDINATES; }
 {CYCLIST_CODE} { yylval.as_int = atoi(yytext); return TK_CYCLIST_CODE; }
 {CYCLIST_NAME} { yylval.as_string = strdup(yytext); return TK_CYCLIST_NAME; }
-{OPEN_PAR} { yylval.as_string = strdup(yytext); return TK_OPEN_PAR; }
-{CLOSE_PAR} { yylval.as_string = strdup(yytext); return TK_CLOSE_PAR; }
-{COMMA} { yylval.as_string = strdup(yytext); return TK_COMMA; }
-{CYCLIST_SEP} { yylval.as_string = strdup(yytext); return TK_CYCLIST_SEP; }
-{SECTION_SEP} { yylval.as_string = strdup(yytext); return TK_SECTION_SEP; }
+{OPEN_PAR} { return TK_OPEN_PAR; }
+{CLOSE_PAR} { return TK_CLOSE_PAR; }
+{COMMA} { return TK_COMMA; }
+{CYCLIST_SEP} { return TK_CYCLIST_SEP; }
+{SECTION_SEP} { return TK_SECTION_SEP; }
 {SECONDS} { yylval.as_int = atoi(yytext); return TK_SECONDS; } 
 . {}
 %%

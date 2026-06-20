@@ -9,12 +9,15 @@
 
 static SymbolTable symbol_table = { 0 };
 static HashTable hash_table = { 0 };
+int frontEndOk = 1;
+
 
 static void construtor() {
-
+  frontEndOk = 1;
 }
 
 static void destructor() {
+  destroySymbolTable(&symbol_table);
   destroyHashTable(&hash_table);
 }
 
@@ -24,32 +27,46 @@ static void destructor() {
 #define INVALID_CITY_CODE "No matching city with code \"%s\"."
 #define INVALID_CYCLIST_CODE "No matching cyclist with code #%d."
 
-void compile(const char* path) {
+
+void translate(const char* path) {
+  if(!frontEndOk) return;
+
+  FILE* output = fopen(path, "w+");
+  if(!output) {
+    fprintf(stderr, "Cannot open output file \"%s\"\n", path);
+    exit(-1);
+  }
+
+  for(int i = 0; i < 1000; i++) {
+    Symbol sym = symbol_table.symbols[i];
+    if(lookup(&symbol_table, i) != NULL) fprintf(
+      output,
+      "%d, %s <%s, %s> %.5lf\n", 
+      i+1, 
+      sym.cyclist_name, 
+      hashTableAt(&hash_table, sym.city_begin)->city_name,
+      hashTableAt(&hash_table, sym.city_end)->city_name,
+      sym.total_time != 0 ? sym.total_distance/sym.total_time : 0
+    );
+  }
+}
+
+void compile(const char* path, const char* output) {
   construtor();
 
   extern FILE* yyin;
   yyin = fopen(path, "r");
 
   if(!yyin) {
-    fprintf(stderr, "Cannot open file named \"\".", path);
+    fprintf(stderr, "Cannot open file named \"%s\".", path);
     exit(-1);
   }
 
   yyparse();
 
   printHashTable(hash_table);
-
-  for(int i = 0; i < 1000; i++) {
-    Symbol sym = symbol_table.symbols[i];
-    if(lookup(&symbol_table, i) != NULL) printf(
-      "%d, %s <%s, %s> %.5lf\n", 
-      i+1, 
-      sym.cyclist_name, 
-      sym.city_begin,
-      sym.city_end,
-      sym.total_time != 0 ? sym.total_distance/sym.total_time : 0
-    );
-  }
+  
+  translate(output);
 
   destructor();
 }

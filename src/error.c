@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+extern int frontEndOk;
 
 const char* ErrorTypeToString(ErrorType kind) {
   switch(kind) {
@@ -13,6 +14,8 @@ const char* ErrorTypeToString(ErrorType kind) {
 }
 
 void emitError(ErrorType kind, const char* fmt, ...) {
+  frontEndOk = 0;
+
   extern int yylineno;
 
   printf("%s At line %d:", ErrorTypeToString(kind), yylineno);

@@ -3,9 +3,9 @@
 #include <stddef.h>
 
 typedef struct {
-  const char* cyclist_name;
-  const char* city_begin;
-  const char* city_end;
+  char* cyclist_name;
+  char* city_begin;
+  char* city_end;
   double total_time;
   double total_distance;
 } Symbol;
@@ -19,3 +19,4 @@ typedef struct {
 
 Symbol* lookup(SymbolTable* self, Key key);
 Symbol* insert(SymbolTable* self, Key key, Symbol symbol);
+void destroySymbolTable(SymbolTable* self);

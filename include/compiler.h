@@ -1,4 +1,4 @@
 #pragma once
 
 
-void compile(const char* path);
+void compile(const char* input, const char* output);

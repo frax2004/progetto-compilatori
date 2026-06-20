@@ -2,8 +2,8 @@
 
 
 typedef struct Entry {
-  const char* city_code;
-  const char* city_name;
+  char* city_code;
+  char* city_name;
   double x;
   double y;
   struct Entry* next;

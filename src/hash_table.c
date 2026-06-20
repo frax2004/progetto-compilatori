@@ -13,13 +13,15 @@
 typedef size_t hash_t;
 
 static hash_t hash(const char* s) {
-  hash_t value = 0;
-  int c;
-  
-  while((c = *s++))
-  value = c + (value << 6) + (value << 16) - value;
-  
-  return value;
+  const char *p = s;
+  unsigned h = 0x811c9dc5;
+  int i;
+
+  int l = strlen(s);
+  for (i = 0; i < l; i++)
+    h = ( h ^ p[i] ) * 0x01000193;
+
+  return h;
 }
 
 static double loadFactor(HashTable* self) {
@@ -109,6 +111,8 @@ void destroyHashTable(HashTable* table) {
     Entry* list = table->entries[i];
     while(list != NULL) {
       Entry* temp = list->next;
+      free(list->city_code);
+      free(list->city_name);
       free(list);
       list = temp;
     }

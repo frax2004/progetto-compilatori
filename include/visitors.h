@@ -1,21 +1,21 @@
 #pragma once
 
 typedef struct {
-  const char* city_code;
-  const char* city_name;
+  char* city_code;
+  char* city_name;
   double x;
   double y;
 } Sec1StmtContext;
 
 typedef struct {
   int cyclist_code;
-  const char* cyclist_name;
-  const char* city_code;
+  char* cyclist_name;
+  char* city_code;
 } Sec2StmtContext;
 
 typedef struct {
   int cyclist_code;
-  const char* city_code;
+  char* city_code;
   int seconds;
 } Sec3StmtContext;
 
