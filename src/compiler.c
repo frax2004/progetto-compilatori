@@ -1,35 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "parser.h"
-#include "visitors.h"
-#include "hash_table.h"
-#include "symbol_table.h"
-#include "error.h"
 #include <math.h>
 
-static SymbolTable symbol_table = { 0 };
-static HashTable hash_table = { 0 };
-int frontEndOk = 1;
+#include "parser.h"
+#include "compiler.h"
 
+static CompilationContext CONTEXT;
+
+CompilationContext* getCompilationContext() {
+  return &CONTEXT;
+}
 
 static void construtor() {
-  frontEndOk = 1;
+  CONTEXT.frontEndOk = 1;
 }
 
 static void destructor() {
-  destroySymbolTable(&symbol_table);
-  destroyHashTable(&hash_table);
+  CONTEXT.inputPath = NULL;
+  destroySymbolTable(&CONTEXT.symbol_table);
+  destroyHashTable(&CONTEXT.hash_table);
 }
 
 
-#define CITY_REDECLARATION "Redeclaration of city %s with city code \"%s\"."
+#define CITY_REDECLARATION "Redeclaration of city \"%s\" with city code \"%s\"."
 #define CYCLIST_REDECLARATION "Redeclaration of cyclist #%d."
 #define INVALID_CITY_CODE "No matching city with code \"%s\"."
 #define INVALID_CYCLIST_CODE "No matching cyclist with code #%d."
 
-
 void translate(const char* path) {
-  if(!frontEndOk) return;
+  if(!CONTEXT.frontEndOk) return;
 
   FILE* output = fopen(path, "w+");
   if(!output) {
@@ -38,14 +37,14 @@ void translate(const char* path) {
   }
 
   for(int i = 0; i < 1000; i++) {
-    Symbol sym = symbol_table.symbols[i];
-    if(lookup(&symbol_table, i) != NULL) fprintf(
+    Symbol sym = CONTEXT.symbol_table.symbols[i];
+    if(lookup(&CONTEXT.symbol_table, i) != NULL) fprintf(
       output,
       "%d, %s <%s, %s> %.5lf\n", 
       i+1, 
       sym.cyclist_name, 
-      hashTableAt(&hash_table, sym.city_begin)->city_name,
-      hashTableAt(&hash_table, sym.city_end)->city_name,
+      hashTableAt(&CONTEXT.hash_table, sym.city_begin)->city_name,
+      hashTableAt(&CONTEXT.hash_table, sym.city_end)->city_name,
       sym.total_time != 0 ? sym.total_distance/sym.total_time : 0
     );
   }
@@ -62,10 +61,9 @@ void compile(const char* path, const char* output) {
     exit(-1);
   }
 
-  yyparse();
+  CONTEXT.inputPath = path;
 
-  printHashTable(hash_table);
-  
+  yyparse();
   translate(output);
 
   destructor();
@@ -73,7 +71,7 @@ void compile(const char* path, const char* output) {
 
 
 void visitSec1Stmt(Sec1StmtContext ctx) {
-  Entry* entry = hashTableAt(&hash_table, ctx.city_code);
+  Entry* entry = hashTableAt(&CONTEXT.hash_table, ctx.city_code);
 
   if(entry->city_name != NULL) {
     emitError(SEMANTIC_ERROR, CITY_REDECLARATION, entry->city_name, entry->city_code);
@@ -87,7 +85,7 @@ void visitSec1Stmt(Sec1StmtContext ctx) {
 
 void visitSec2Stmt(Sec2StmtContext ctx) {
   // cyclist_code in [1, 1000] -> key in [0, 999]
-  Symbol* symbol = lookup(&symbol_table, ctx.cyclist_code-1);
+  Symbol* symbol = lookup(&CONTEXT.symbol_table, ctx.cyclist_code-1);
 
   int ok = 1;
   if(symbol != NULL) {
@@ -95,14 +93,14 @@ void visitSec2Stmt(Sec2StmtContext ctx) {
     ok = 0;
   }
   
-  if(!hashTableContains(&hash_table, ctx.city_code)) {
+  if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code)) {
     emitError(SEMANTIC_ERROR, INVALID_CITY_CODE, ctx.city_code);
     ok = 0;
   }
 
   if(ok) {
     // cyclist_code in [1, 1000] -> key in [0, 999]
-    insert(&symbol_table, ctx.cyclist_code-1, (Symbol) {
+    insert(&CONTEXT.symbol_table, ctx.cyclist_code-1, (Symbol) {
       .cyclist_name = ctx.cyclist_name,
       .city_begin = ctx.city_code,
       .city_end = ctx.city_code,
@@ -112,13 +110,9 @@ void visitSec2Stmt(Sec2StmtContext ctx) {
   }
 }
 
-typedef struct {
-  double x;
-  double y;
-} Vec2;
 
-Vec2 toCoords(const char* city_name) {
-  Entry* entry = hashTableAt(&hash_table, city_name);
+Vec2 toCoords(char* city_name) {
+  Entry* entry = hashTableAt(&CONTEXT.hash_table, city_name);
   return (Vec2) {
     .x = entry->x,
     .y = entry->y
@@ -128,7 +122,7 @@ Vec2 toCoords(const char* city_name) {
 
 void visitSec3Stmt(Sec3StmtContext ctx) {
   // cyclist_code in [1, 1000] -> key in [0, 999]
-  Symbol* symbol = lookup(&symbol_table, ctx.cyclist_code-1);
+  Symbol* symbol = lookup(&CONTEXT.symbol_table, ctx.cyclist_code-1);
 
   int ok = 1;
   if(symbol == NULL) {
@@ -136,7 +130,7 @@ void visitSec3Stmt(Sec3StmtContext ctx) {
     ok = 0;
   }
 
-  if(!hashTableContains(&hash_table, ctx.city_code)) {
+  if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code)) {
     emitError(SEMANTIC_ERROR, INVALID_CITY_CODE, ctx.city_code);
     ok = 0;
   }

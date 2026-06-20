@@ -1,13 +1,15 @@
+%define parse.error verbose
+%locations
 
 %{
-  #include "visitors.h"
+  #include "compiler.h"
   #include <stdlib.h>
   #include <stdio.h>
   
   int yylex();
   void yyerror(const char *s);
 %}
-%define parse.error verbose
+
 
 %union {
   int as_int;

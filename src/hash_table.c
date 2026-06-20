@@ -1,4 +1,4 @@
-#include "hash_table.h"
+#include "compiler.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -6,9 +6,6 @@
 #include <math.h>
 
 #define MAX_LOAD_FACTOR .75f
-
-
-
 
 typedef size_t hash_t;
 
@@ -68,7 +65,7 @@ static void hashTableRehash(HashTable* self) {
   memcpy(self, &rehashed, sizeof(HashTable));
 }
 
-Entry* hashTableAt(HashTable* self, const char* key) {
+Entry* hashTableAt(HashTable* self, char* key) {
   if(loadFactor(self) > MAX_LOAD_FACTOR) {
     hashTableRehash(self);
   }
@@ -93,7 +90,7 @@ Entry* hashTableAt(HashTable* self, const char* key) {
   }
 }
 
-int hashTableContains(HashTable* self, const char* key) {
+int hashTableContains(HashTable* self, char* key) {
   if(self->entries == NULL || self->capacity == 0 || self->size == 0) return 0;
 
   hash_t hash_code = hash(key) % self->capacity;

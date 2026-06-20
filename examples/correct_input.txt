@@ -1,24 +1,235 @@
-PMO "Palermo" (15.9,90.35)
-CFU "Cefalù" (35.1,87.0)
-TRP "Trapani" (2.8,87.9)
-MSN "Messina" (65.0,98.1)
+CFU "Cefalù" (421.03272215000277, 763.9054705519877)
+VNZ "Venezia" (432.54564911309876, 621.7465300805482)
+CTN "Catania" (998.6877212441609, 645.4396489939338)
+BAR "Bari" (150.9227026696379, 861.787651319025)
+RMA "Roma" (523.150780678647, 187.6028218371075)
+CFU "Cefalù" (576.6363272853996, 980.7224700624922)
+CTZ "Catanzaro" (379.3341138583309, 629.100000402533)
+GNV "Genova" (206.11138962469855, 352.54754961096234)
+PMO "Palermo" (810.2782768442065, 753.4711367628428)
+BAR "Bari" (25.83199879070641, 575.2485794659402)
+FRZ "Firenze" (511.44848846004334, 37.531794011888884)
+CTN "Catania" (542.386683954516, 324.2478291261183)
+CFU "Cefalù" (134.274228404462, 749.4456273726491)
+GNV "Genova" (683.5787428701825, 834.8173690815247)
+PMO "Palermo" (280.84682161365924, 586.828319648973)
+CFU "Cefalù" (171.11546133517962, 505.31489162673716)
 %%%
-125
-Marco Sellino
+252
+Dennis Evan
+BAR
+&&&
+796
+Virginia Perrotti
+FRZ
+&&&
+178
+Marta Evan
+MLN
+&&&
+429
+Riccardo Tocco
+RMA
+&&&
+738
+Dennis Marzano
+GNV
+&&&
+250
+Riccardo Stark
+VRS
+&&&
+112
+Emilio Colombo
+CTZ
+&&&
+918
+Maria Ritchie
+RMA
+&&&
+883
+Dennis Kirby
 PMO
 &&&
-256
-Claudio Catena
+606
+Francesco Evan
+PMO
+&&&
+792
+Dennis Pescini
+TRN
+&&&
+664
+Dennis Stroustrap
+TRN
+&&&
+753
+Dennis Kirby
+CTZ
+&&&
+857
+Bjarne Gilli
+RMA
+&&&
+744
+Bjarne Stroustrap
+RMA
+&&&
+105
+Riccardo Pescini
+FRZ
+&&&
+113
+Virginia Marzano
+FRZ
+&&&
+749
+Tony Gilli
+BAR
+&&&
+795
+Vanessa Perrotti
+GNV
+&&&
+415
+Dennis Pescini
+FRZ
+&&&
+430
+Maria Colombo
+GNV
+&&&
+66
+Francesco Gilli
+FRZ
+&&&
+996
+Marta Kirby
+MLN
+&&&
+982
+Vanessa Stroustrap
+CFU
+&&&
+48
+Vanessa Kirby
+PMO
+&&&
+235
+Dennis Perrotti
+TRN
+&&&
+5
+Virginia Marzano
+GNV
+&&&
+243
+Vanessa Pescini
+BAR
+&&&
+905
+Virginia Perrotti
+TRN
+&&&
+681
+Tony Colombo
+VRS
+&&&
+339
+Vanessa Tocco
+VNZ
+&&&
+97
+Francesco Pescini
+MLN
+&&&
+714
+Marta Stark
+CTZ
+&&&
+210
+Gianmarco Perrotti
+VRS
+&&&
+329
+Emilio Gilli
+TRN
+&&&
+641
+Bjarne Marzano
+RMA
+&&&
+331
+Riccardo Marzano
+CTN
+&&&
+757
+Gianmarco Tocco
+CTN
+&&&
+969
+Sara Marzano
+CTN
+&&&
+436
+Tony Gilli
+VNZ
+&&&
+602
+Emilio Marzano
+VNZ
+&&&
+858
+Vanessa Kirby
+RMA
+&&&
+350
+Riccardo Stroustrap
+MSN
+&&&
+985
+Emilio Ritchie
+VNZ
+&&&
+866
+Bjarne Tocco
 TRP
 &&&
-965
-Giuseppe Pedale
-MSN
+728
+Virginia Evan
+FRZ
+&&&
+452
+Sara Tocco
+CTZ
+&&&
+280
+Virginia Kirby
+CTN
+&&&
+869
+Dennis Perrotti
+RMA
 %%%
-965 CFU 38250
-125 CFU 16008
-965 PMO 15989
-125 MSN 38126
-125 CFU 38185
-125 PMO 16420
-965 TRP 11001
+105 CTZ 97655
+996 TRN 63749
+905 TRN 57844
+602 PMO 94835
+728 FRZ 96032
+602 FRZ 95033
+350 CTN 65821
+430 GNV 36700
+329 CFU 72019
+641 MSN 96165
+250 CTN 35042
+112 MSN 95426
+858 VRS 21652
+97 GNV 99159
+280 VRS 16669
+97 MLN 12519
+792 CTZ 13405
+869 MLN 25542
+430 PMO 64666
+883 TRN 56437
+178 CFU 31646
+744 GNV 97812

@@ -1,4 +1,4 @@
-#include "symbol_table.h"
+#include "compiler.h"
 #include <stdlib.h>
 
 Symbol* lookup(SymbolTable* self, Key key) {

@@ -1,8 +1,24 @@
-#include "error.h"
+#include "compiler.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include "parser.h"
 
-extern int frontEndOk;
+#define RGB(r, g, b) "\033[38;2;"#r";"#g";"#b"m"
+
+
+#define RED RGB(227, 61, 61)
+#define GREEN RGB(121, 237, 121)
+#define BLUE RGB(21, 163, 224)
+#define PURPLE RGB(220, 11, 199)
+#define YELLOW RGB(255, 215, 0)
+#define ORANGE RGB(253, 160, 40)
+#define WHITE RGB(255, 255, 255)
+#define GRAY RGB(100, 100, 100)
+#define RESET "\033[0m"
+#define BOLD "\033[1m"
+
+
+
 
 const char* ErrorTypeToString(ErrorType kind) {
   switch(kind) {
@@ -13,19 +29,34 @@ const char* ErrorTypeToString(ErrorType kind) {
   }
 }
 
+
 void emitError(ErrorType kind, const char* fmt, ...) {
-  frontEndOk = 0;
+  CompilationContext* ctx = getCompilationContext();
 
   extern int yylineno;
 
-  printf("%s At line %d:", ErrorTypeToString(kind), yylineno);
+  fprintf(
+    stderr,
+    "[%s%s%s%s] in file %s%s:%d%s: ", 
+    BOLD,
+    RED, 
+    ErrorTypeToString(kind), 
+    RESET, 
+    GRAY,
+    ctx->inputPath, 
+    yylineno,
+    RESET
+  );
+
+  fprintf(stderr, "%s", RED);
   
   va_list args;
   va_start(args, fmt);
   vfprintf(stderr, fmt, args);
   va_end(args);
 
-  putchar('\n');
+  fprintf(stderr, "%s\n", RESET);
+  fflush(stderr);
 }
 
 void yyerror(const char* msg) {
