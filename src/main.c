@@ -1,6 +1,11 @@
-#include <stdio.h>
+#include "compiler.h"
+
+
 
 int main(int argc, const char** argv) {
-  printf("Hello, World!");
+  if(argc < 2) return -1;
+
+  compile(argv[1]);
+  
   return 0;
 }
