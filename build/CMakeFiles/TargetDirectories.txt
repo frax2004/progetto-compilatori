@@ -1,3 +1,0 @@
-C:/Dev/uni/comp/progetto-compilatori/build/CMakeFiles/compiler.dir
-C:/Dev/uni/comp/progetto-compilatori/build/CMakeFiles/edit_cache.dir
-C:/Dev/uni/comp/progetto-compilatori/build/CMakeFiles/rebuild_cache.dir
