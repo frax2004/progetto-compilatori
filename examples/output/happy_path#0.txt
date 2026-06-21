@@ -1,0 +1,7 @@
+5, Sara Perrotti <Venezia, Bari> 13.22816
+11, Emilio Pescini <Bari, Catanzaro> 19.10003
+165, Bjarne Evan <Venezia, Catanzaro> 10.13437
+184, Dennis Gilli <Catanzaro, Bari> 7.77763
+249, Maria Gilli <Venezia, Genova> 4.60479
+323, Sara Perrotti <Catanzaro, Venezia> 7.68258
+445, Maria Stroustrap <Catanzaro, Venezia> 5.65813
