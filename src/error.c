@@ -1,6 +1,8 @@
-#include "compiler.h"
 #include <stdarg.h>
+#include <string.h>
 #include <stdio.h>
+
+#include "compiler.h"
 #include "parser.h"
 
 #define RGB(r, g, b) "\033[38;2;"#r";"#g";"#b"m"
@@ -19,7 +21,8 @@
 
 #define FOR(i, a, b) for(int i = a; i < b; ++i)
 
-
+#define MAX_EXPECTED_TOKENS_COUNT 8
+#define MAX_SYMBOL_LENGTH 32
 
 const char* ErrorTypeToString(ErrorType kind) {
   switch(kind) {
@@ -93,29 +96,65 @@ void emitError(ErrorType kind, YYLTYPE where, const char* fmt, ...) {
   fflush(stderr);
 }
 
+int reportSyntaxError(const void* yyctx) {
+  CompilationContext* ctx = getCompilationContext();
+  ctx->frontEndOk = 0;
 
-int yypcontext_token(const void* ctx);
-YYLTYPE* yypcontext_location(const void* ctx);
-yypcontext_expected_tokens(const void* yyctx, int yyarg[], int yyargn);
+  int token_kind = getCurrentToken(yyctx);
+  const char* lexeme = getSymbolName(token_kind);
+  YYLTYPE where = getCurrentTokenLocation(yyctx) != NULL ? *getCurrentTokenLocation(yyctx) : (YYLTYPE) {};
 
+  int expectedBuffer[MAX_EXPECTED_TOKENS_COUNT];
+  int expectedCount = getExpectedTokens(yyctx, expectedBuffer, MAX_EXPECTED_TOKENS_COUNT);
 
-int yyreport_syntax_error(const void* yyctx) {
-  int token_kind = yypcontext_token(yyctx);
-  YYLTYPE where = yypcontext_location(yyctx) != NULL ? *yypcontext_location(yyctx) : (YYLTYPE) {};
+  int lookahead = getCurrentToken(yyctx);
+  const char* unexpected = lookahead >= 0 ? getSymbolName(lookahead) : "EPSILON";
   
+  where.last_column = where.first_column + strlen(unexpected) - 1;
+
+  emitError(SYNTAX_ERROR, where, "%s", unexpected);
+
+  int res = 0;
+  if(expectedCount < 0) {
+    // Esaurimento della memoria, fai gestire l'errore a bison
+    res = expectedCount;
+  } else {
+    fprintf(
+      stderr,
+      "[%s%sNote%s] in file %s%s:%d:%d%s: ", 
+      BOLD,
+      BLUE,  
+      RESET, 
+      GRAY,
+      ctx->inputPath, 
+      where.first_line,
+      where.first_column,
+      RESET
+    );
+
+    fprintf(stderr, "Expected one of these tokens: [");
+
+    FOR(i, 0, expectedCount) fprintf(
+      stderr,
+      "%s%s%s%s%s",
+      BOLD,
+      RGB(39, 174, 125),
+      getSymbolName(expectedBuffer[i]),
+      RESET,
+      i < expectedCount - 1 ? ", " : ""
+    );
+
+
+    fprintf(stderr, "], got %s%s%s%s\n", BOLD, RED, unexpected, RESET);
+  }
+  
+  fflush(stderr);
+  return res;
 }
 
 void yyerror(const char* msg) {
-  extern int yylineno;
+  CompilationContext* ctx = getCompilationContext();
+  ctx->frontEndOk = 0;
 
-  emitError(
-    SYNTAX_ERROR, 
-    (YYLTYPE) {
-      .first_line = yylineno,
-      .last_line = yylineno,
-      .first_column = 0,
-      .last_line = 0
-    }, 
-    msg
-  );
+  fprintf(stderr, "[%s%sBuy more RAM! (lol)%s]: %s", RED, BOLD, RESET, msg);
 }

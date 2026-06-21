@@ -88,5 +88,12 @@ void visitSec3Stmt(Sec3StmtContext ctx);
 void emitError(ErrorType kind, YYLTYPE where, const char* fmt, ...);
 void emitNote(YYLTYPE where, const char* fmt, ...);
 
+
+const char* getSymbolName(int symbol);
+int getCurrentToken(const void* ctx);
+YYLTYPE* getCurrentTokenLocation(const void* ctx);
+int getExpectedTokens(const void* yyctx, int yyarg[], int yyargn);
+int reportSyntaxError(const void* yyctx);
+
 void compile(const char* input, const char* output);
 

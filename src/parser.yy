@@ -8,6 +8,7 @@
   
   int yylex();
   void yyerror(const char *s);
+
 %}
 
 
@@ -74,3 +75,25 @@ section3: sec3_stmt sec3_continue;
 
 axiom: section1 TK_SECTION_SEP TK_ENDLINE section2 TK_SECTION_SEP TK_ENDLINE section3;
 %%
+
+
+
+const char* getSymbolName(int symbol) {
+  return yysymbol_name(symbol);
+}
+
+int getCurrentToken(const void* ctx) {
+  return yypcontext_token((const yypcontext_t*)ctx);
+}
+
+YYLTYPE* getCurrentTokenLocation(const void* ctx) {
+  return yypcontext_location((const yypcontext_t*)ctx);
+}
+
+int getExpectedTokens(const void* yyctx, int yyarg[], int yyargn) {
+  return yypcontext_expected_tokens((const yypcontext_t*)yyctx, (yysymbol_kind_t*)yyarg, yyargn);
+}
+
+int yyreport_syntax_error(const yypcontext_t* yyctx) {
+  return reportSyntaxError((void*)yyctx);
+}
