@@ -1,7 +1,7 @@
-5, Sara Perrotti <Venezia, Bari> 13.22816
-11, Emilio Pescini <Bari, Catanzaro> 19.10003
-165, Bjarne Evan <Venezia, Catanzaro> 10.13437
-184, Dennis Gilli <Catanzaro, Bari> 7.77763
-249, Maria Gilli <Venezia, Genova> 4.60479
-323, Sara Perrotti <Catanzaro, Venezia> 7.68258
-445, Maria Stroustrap <Catanzaro, Venezia> 5.65813
+267, Francesco Tocco <Roma, Bari> 7.15380
+288, Emilio Perrotti <Roma, Trapani> 26.47028
+433, Riccardo Ritchie <Cefalu, Trapani> 19.76672
+681, Gianmarco Stark <Roma, Roma> 0.00000
+733, Tony Marzano <Trapani, Trapani> 6.78392
+784, Maria Kirby <Cefalu, Bari> 27.54324
+909, Dennis Marzano <Cefalu, Cefalu> 8.66457

@@ -108,18 +108,75 @@ def happy_path(k_cities, k_cyclists, max_stages):
   section2 = f'\n{CYCLIST_SEP}\n'.join(map(str, SECTION2.values()))
   section3 = '\n'.join(map(str, SECTION3))
 
-  return f"""{section1}
-{SECTION_SEP}
-{section2}
-{SECTION_SEP}
-{section3}"""
+  return f"""{section1}\n{SECTION_SEP}\n{section2}\n{SECTION_SEP}\n{section3}"""
 
+
+def semantic_error(k_cities, k_cyclists, max_stages):
+  SECTION1 = [CityDecl(
+    rd.choice(CITIES), 
+    Coords.random()
+  )]
+  SECTION2 = [CyclistDecl(
+    rd.choice(NUMBERS), 
+    random_name(), 
+    rd.choice(CITIES).code
+  ) for _ in range(k_cyclists)]
+  SECTION3 = [StageStmt(
+    rd.choice(NUMBERS),
+    rd.choice(CITIES).code,
+    rd.choice(SECONDS)
+  ) for _ in range(max_stages)]
+
+  section1 = '\n'.join(map(str, SECTION1))
+  section2 = f'\n{CYCLIST_SEP}\n'.join(map(str, SECTION2))
+  section3 = '\n'.join(map(str, SECTION3))
+
+  return f"""{section1}\n{SECTION_SEP}\n{section2}\n{SECTION_SEP}\n{section3}"""
+
+def lexical_error(k_cities, k_cyclists, max_stages):
+  program = happy_path(k_cities, k_cyclists, max_stages)
+  bytes = bytearray(program, 'utf-8')
+
+  for _ in range(10):
+    bytes.insert(rd.randint(0, len(bytes)-1), int.from_bytes('@'.encode()))
+
+  return bytes.decode()
+
+def syntax_error(k_cities, k_cyclists, max_stages):
+  POSSIBLE_CITIES = random_subset(CITIES, k_cities)
+  POSSIBLE_NUMBERS = random_subset(NUMBERS, k_cyclists)
+  
+  SECTION1 = {city.code: CityDecl(city, Coords.random()) for city in POSSIBLE_CITIES}
+  SECTION2 = {code: CyclistDecl(code, random_name(), rd.choice([*SECTION1.keys()])) for code in POSSIBLE_NUMBERS}
+
+  SECTION3 = []
+  possible_checkpoints = [*SECTION1.keys()]
+  current_states = {cyclist.code: cyclist.city for cyclist in SECTION2.values()}
+  for _ in range(max_stages):
+    code = rd.choice([*SECTION2.keys()])
+    prob = 1.0/(len(possible_checkpoints)-1)
+    weights = [prob if c != current_states[code] else 0 for c in possible_checkpoints]
+    city = rd.choices(possible_checkpoints, weights)[0]
+    SECTION3.append(StageStmt(code, city, rd.choice(SECONDS)))
+    current_states[code] = city
+
+  section1 = '\n'.join(map(str, SECTION1.values()))
+  section2 = f'\n{CYCLIST_SEP}\n'.join(map(str, SECTION2.values()))
+  section3 = '\n'.join(map(str, SECTION3))
+
+  program = f"""{section1}\n{SECTION_SEP}\n{section2}\n{SECTION_SEP}\n{section3}""".splitlines()
+  
+  indexes = random_subset([*range(len(program))], 16)
+  for i in indexes:
+    program[i] += f" {rd.choice([*SECTION1.keys(), *map(str, SECTION2.keys())])}"
+
+  return '\n'.join(program)
 
 gen_table = [
   (happy_path, 4, 7, 15),
-  (happy_path, 6, 3, 30),
-  (happy_path, 3, 5, 4),
-  (happy_path, 2, 2, 9),
+  (semantic_error, 4, 7, 15),
+  (syntax_error, 4, 7, 15),
+  (lexical_error, 4, 7, 15)
 ]
 
 import subprocess
