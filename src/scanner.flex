@@ -3,6 +3,7 @@
 %{
   #include <string.h>
   #include "parser.h"
+  #include <compiler.h>
   int yycolumn = 1;
 
   #define YY_USER_ACTION \
@@ -61,5 +62,14 @@ SECONDS "0"|{NON_ZERO_DIGIT}{DIGIT}*
 {SECTION_SEP} { return TK_SECTION_SEP; }
 {SECONDS} { yylval.as_int = atoi(yytext); return TK_SECONDS; } 
 {ENDLINE} { yycolumn = 1; return TK_ENDLINE; }
-. {}
+{WHITE_SPACE} {}
+
+{WORD} {
+  emitError(LEXICAL_ERROR, yylloc, "%s", yytext);
+  emitNote(yylloc, "Unrecognized token '%s'", yytext);
+}
+. {
+  emitError(LEXICAL_ERROR, yylloc, "%c", *yytext);
+  emitNote(yylloc, "Unrecognized symbol '%c'", *yytext);
+}
 %%

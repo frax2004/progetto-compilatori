@@ -93,6 +93,18 @@ void emitError(ErrorType kind, YYLTYPE where, const char* fmt, ...) {
   fflush(stderr);
 }
 
+
+int yypcontext_token(const void* ctx);
+YYLTYPE* yypcontext_location(const void* ctx);
+yypcontext_expected_tokens(const void* yyctx, int yyarg[], int yyargn);
+
+
+int yyreport_syntax_error(const void* yyctx) {
+  int token_kind = yypcontext_token(yyctx);
+  YYLTYPE where = yypcontext_location(yyctx) != NULL ? *yypcontext_location(yyctx) : (YYLTYPE) {};
+  
+}
+
 void yyerror(const char* msg) {
   extern int yylineno;
 

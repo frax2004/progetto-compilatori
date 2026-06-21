@@ -1,0 +1,24 @@
+PMO "Palermo" (15.9,90.35)
+CFU "Cefalù" (35.1,87.0)
+TRP "Trapani" (2.8,87.9)
+MSN "Messina" (65.0,98.1)
+%%%
+125
+Marco Sellino
+PMO
+&&&
+256
+Claudio Catena
+TRP
+&&& PMO
+965
+Giuseppe Pedale
+MSN
+%%%
+965 CFU 38250
+125 CFU 16008
+965 PMO 15989
+125 MSN 38126
+125 CFU 38185
+125 PMO 16420
+965 TRP 11001

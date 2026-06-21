@@ -1,7 +1,0 @@
-832, Emilio Stark <Palermo, Palermo> 17.52322
-833, Emilio Ritchie <Trapani, Messina> 13.91448
-834, Marta Kirby <Palermo, Palermo> 0.00000
-835, Dennis Marzano <Cefalu, Messina> 6.09888
-836, Bjarne Evan <Cefalu, Trapani> 9.88708
-837, Virginia Stroustrap <Cefalu, Palermo> 11.34993
-838, Sara Gilli <Cefalu, Palermo> 5.23073

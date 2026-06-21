@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "parser.h"
 #include "compiler.h"
@@ -26,6 +27,7 @@ static void destructor() {
 #define CYCLIST_REDECLARATION "Redeclaration of cyclist #%d.\n"
 #define INVALID_CITY_CODE "No matching city with code \"%s\".\n"
 #define INVALID_CYCLIST_CODE "No matching cyclist with code #%d.\n"
+#define IDENTICAL_ADJACENT_CHECKPOINTS "In checkpoint declaration, the next checkpoint (reached by cyclist with code #%d) must be different from the previously reached \"%s\".\n"
 
 void translate(const char* path) {
   if(!CONTEXT.frontEndOk) return;
@@ -142,12 +144,26 @@ void visitSec3Stmt(Sec3StmtContext ctx) {
     ok = 0;
   }
 
+  if(symbol != NULL) {
+    char* prev = symbol->city_end;
+    char* next = ctx.city_code.value;
+  
+    if(strcmp(prev, next) == 0) {
+      emitError(SEMANTIC_ERROR, ctx.city_code.where, "%s", ctx.city_code.value);
+      emitNote(ctx.city_code.where, IDENTICAL_ADJACENT_CHECKPOINTS, ctx.cyclist_code.value, prev);
+      ok = 0;
+    }
+  }
+
   if(ok) {
-    const Vec2 begin = toCoords(symbol->city_end);
-    const Vec2 end = toCoords(ctx.city_code.value);
+    char* prev = symbol->city_end;
+    char* next = ctx.city_code.value;
+
+    const Vec2 begin = toCoords(prev);
+    const Vec2 end = toCoords(next);
 
     // cyclist_code in [1, 1000] -> key in [0, 999]
-    symbol->city_end = ctx.city_code.value;
+    symbol->city_end = next;
     symbol->total_distance += 1000 * sqrt(pow(end.y - begin.y, 2) + pow(end.x - begin.x, 2));
     symbol->total_time += ctx.seconds.value;
   }
