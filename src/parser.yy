@@ -72,8 +72,15 @@ sec3_continue: TK_ENDLINE section3 | %empty;
 
 section3: sec3_stmt sec3_continue;
 
+endline_list_helper: TK_ENDLINE endline_list;
 
-axiom: section1 TK_SECTION_SEP TK_ENDLINE section2 TK_SECTION_SEP TK_ENDLINE section3;
+endline_list: %empty | endline_list_helper;
+
+section1_opt: section1 | endline_list;
+section2_opt: section2 | endline_list;
+section3_opt: TK_ENDLINE section3 | endline_list;
+
+axiom: section1_opt TK_SECTION_SEP TK_ENDLINE section2_opt TK_SECTION_SEP section3_opt;
 %%
 
 

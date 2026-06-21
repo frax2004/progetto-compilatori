@@ -1,3 +1,0 @@
-125, Marco Sellino <Palermo, Palermo> 0.94509
-256, Claudio Catena <Trapani, Trapani> 0.00000
-965, Giuseppe Pedale <Messina, Trapani> 0.99189
