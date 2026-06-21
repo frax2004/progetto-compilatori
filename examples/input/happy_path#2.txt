@@ -1,0 +1,28 @@
+MSN "Messina" (404.43301502737273, 984.7870701115917)
+TRP "Trapani" (421.3277295658751, 850.9314556333849)
+RMA "Roma" (655.1640231354811, 844.916299840811)
+%%%
+773
+Emilio Kirby
+MSN
+&&&
+770
+Tony Marzano
+MSN
+&&&
+771
+Dennis Perrotti
+RMA
+&&&
+774
+Sara Stroustrap
+RMA
+&&&
+772
+Emilio Colombo
+RMA
+%%%
+770 RMA 19594
+770 TRP 34228
+772 RMA 30480
+770 RMA 44399

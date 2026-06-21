@@ -26,13 +26,38 @@
 
 %%
 sec1_stmt: TK_CITY_CODE TK_CITY_NAME TK_OPEN_PAR TK_COORDINATES TK_COMMA TK_COORDINATES TK_CLOSE_PAR
-{ visitSec1Stmt((Sec1StmtContext) {$1, $2, $4, $6}); };
+{ 
+  visitSec1Stmt(
+    (Sec1StmtContext) {
+      {$1, @1}, 
+      {$2, @2}, 
+      {$4, @4}, 
+      {$6, @6}
+    }
+  ); 
+};
 
 sec2_stmt: TK_CYCLIST_CODE TK_ENDLINE TK_CYCLIST_NAME TK_ENDLINE TK_CITY_CODE
-{ visitSec2Stmt((Sec2StmtContext) {$1,$3, $5}); };
+{ 
+  visitSec2Stmt(
+    (Sec2StmtContext) {
+      {$1, @1},
+      {$3, @3}, 
+      {$5, @5}
+    }
+  ); 
+};
 
 sec3_stmt: TK_CYCLIST_CODE TK_CITY_CODE TK_SECONDS
-{ visitSec3Stmt((Sec3StmtContext) {$1,$2, $3}); };
+{ 
+  visitSec3Stmt(
+    (Sec3StmtContext) {
+      {$1, @1},
+      {$2, @2}, 
+      {$3, @3}
+    }
+  ); 
+};
 
 sec1_continue: TK_ENDLINE section1 | TK_ENDLINE;
 

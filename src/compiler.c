@@ -22,10 +22,10 @@ static void destructor() {
 }
 
 
-#define CITY_REDECLARATION "Redeclaration of city \"%s\" with city code \"%s\"."
-#define CYCLIST_REDECLARATION "Redeclaration of cyclist #%d."
-#define INVALID_CITY_CODE "No matching city with code \"%s\"."
-#define INVALID_CYCLIST_CODE "No matching cyclist with code #%d."
+#define CITY_REDECLARATION "Redeclaration of city \"%s\" with city code \"%s\".\n"
+#define CYCLIST_REDECLARATION "Redeclaration of cyclist #%d.\n"
+#define INVALID_CITY_CODE "No matching city with code \"%s\".\n"
+#define INVALID_CYCLIST_CODE "No matching cyclist with code #%d.\n"
 
 void translate(const char* path) {
   if(!CONTEXT.frontEndOk) return;
@@ -48,6 +48,8 @@ void translate(const char* path) {
       sym.total_time != 0 ? sym.total_distance/sym.total_time : 0
     );
   }
+
+  fclose(output);
 }
 
 void compile(const char* path, const char* output) {
@@ -71,39 +73,42 @@ void compile(const char* path, const char* output) {
 
 
 void visitSec1Stmt(Sec1StmtContext ctx) {
-  Entry* entry = hashTableAt(&CONTEXT.hash_table, ctx.city_code);
+  Entry* entry = hashTableAt(&CONTEXT.hash_table, ctx.city_code.value);
 
   if(entry->city_name != NULL) {
-    emitError(SEMANTIC_ERROR, CITY_REDECLARATION, entry->city_name, entry->city_code);
+    emitError(SEMANTIC_ERROR, ctx.city_code.where, "%s", ctx.city_code.value);
+    emitNote(ctx.city_code.where, CITY_REDECLARATION, entry->city_name, entry->city_code);
     return;
   }
 
-  entry->city_name = ctx.city_name;
-  entry->x = ctx.x;
-  entry->y = ctx.y;
+  entry->city_name = ctx.city_name.value;
+  entry->x = ctx.x.value;
+  entry->y = ctx.y.value;
 }
 
 void visitSec2Stmt(Sec2StmtContext ctx) {
   // cyclist_code in [1, 1000] -> key in [0, 999]
-  Symbol* symbol = lookup(&CONTEXT.symbol_table, ctx.cyclist_code-1);
+  Symbol* symbol = lookup(&CONTEXT.symbol_table, ctx.cyclist_code.value-1);
 
   int ok = 1;
   if(symbol != NULL) {
-    emitError(SEMANTIC_ERROR, CYCLIST_REDECLARATION, ctx.cyclist_code);
+    emitError(SEMANTIC_ERROR, ctx.cyclist_code.where, "%d", ctx.cyclist_code.value);
+    emitNote(ctx.cyclist_code.where, CYCLIST_REDECLARATION, ctx.cyclist_code.value);
     ok = 0;
   }
   
-  if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code)) {
-    emitError(SEMANTIC_ERROR, INVALID_CITY_CODE, ctx.city_code);
+  if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code.value)) {
+    emitError(SEMANTIC_ERROR, ctx.city_code.where, "%s", ctx.city_code.value);
+    emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value);
     ok = 0;
   }
 
   if(ok) {
     // cyclist_code in [1, 1000] -> key in [0, 999]
-    insert(&CONTEXT.symbol_table, ctx.cyclist_code-1, (Symbol) {
-      .cyclist_name = ctx.cyclist_name,
-      .city_begin = ctx.city_code,
-      .city_end = ctx.city_code,
+    insert(&CONTEXT.symbol_table, ctx.cyclist_code.value-1, (Symbol) {
+      .cyclist_name = ctx.cyclist_name.value,
+      .city_begin = ctx.city_code.value,
+      .city_end = ctx.city_code.value,
       .total_distance = 0,
       .total_time = 0
     });
@@ -122,26 +127,28 @@ Vec2 toCoords(char* city_name) {
 
 void visitSec3Stmt(Sec3StmtContext ctx) {
   // cyclist_code in [1, 1000] -> key in [0, 999]
-  Symbol* symbol = lookup(&CONTEXT.symbol_table, ctx.cyclist_code-1);
+  Symbol* symbol = lookup(&CONTEXT.symbol_table, ctx.cyclist_code.value-1);
 
   int ok = 1;
   if(symbol == NULL) {
-    emitError(SEMANTIC_ERROR, INVALID_CYCLIST_CODE, ctx.cyclist_code);
+    emitError(SEMANTIC_ERROR, ctx.cyclist_code.where, "%d", ctx.cyclist_code.value);
+    emitNote(ctx.cyclist_code.where, INVALID_CYCLIST_CODE, ctx.cyclist_code.value);
     ok = 0;
   }
 
-  if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code)) {
-    emitError(SEMANTIC_ERROR, INVALID_CITY_CODE, ctx.city_code);
+  if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code.value)) {
+    emitError(SEMANTIC_ERROR, ctx.city_code.where, "%s", ctx.city_code.value);
+    emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value);
     ok = 0;
   }
 
   if(ok) {
     const Vec2 begin = toCoords(symbol->city_end);
-    const Vec2 end = toCoords(ctx.city_code);
+    const Vec2 end = toCoords(ctx.city_code.value);
 
     // cyclist_code in [1, 1000] -> key in [0, 999]
-    symbol->city_end = ctx.city_code;
+    symbol->city_end = ctx.city_code.value;
     symbol->total_distance += 1000 * sqrt(pow(end.y - begin.y, 2) + pow(end.x - begin.x, 2));
-    symbol->total_time += ctx.seconds;
+    symbol->total_time += ctx.seconds.value;
   }
 }

@@ -17,6 +17,7 @@
 #define RESET "\033[0m"
 #define BOLD "\033[1m"
 
+#define FOR(i, a, b) for(int i = a; i < b; ++i)
 
 
 
@@ -29,36 +30,80 @@ const char* ErrorTypeToString(ErrorType kind) {
   }
 }
 
-
-void emitError(ErrorType kind, const char* fmt, ...) {
+void emitNote(YYLTYPE where, const char* fmt, ...) {
   CompilationContext* ctx = getCompilationContext();
-
-  extern int yylineno;
 
   fprintf(
     stderr,
-    "[%s%s%s%s] in file %s%s:%d%s: ", 
+    "[%s%sNote%s] in file %s%s:%d:%d%s: ", 
+    BOLD,
+    BLUE,  
+    RESET, 
+    GRAY,
+    ctx->inputPath, 
+    where.first_line,
+    where.first_column,
+    RESET
+  );
+
+  va_list args;
+  va_start(args, fmt);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+
+  fprintf(stderr, "\n");
+  fflush(stderr);
+}
+
+void emitError(ErrorType kind, YYLTYPE where, const char* fmt, ...) {
+  CompilationContext* ctx = getCompilationContext();
+  ctx->frontEndOk = 0;
+
+  fprintf(
+    stderr,
+    "[%s%s%s%s] in file %s%s:%d:%d%s:\n", 
     BOLD,
     RED, 
     ErrorTypeToString(kind), 
     RESET, 
     GRAY,
     ctx->inputPath, 
-    yylineno,
+    where.first_line,
+    where.first_column,
     RESET
   );
 
+  fprintf(stderr, " %s%6d |%s", GRAY, where.first_line, RESET);
+  FOR(i, 0, where.first_column) fputc(' ', stderr);
   fprintf(stderr, "%s", RED);
-  
+
   va_list args;
   va_start(args, fmt);
   vfprintf(stderr, fmt, args);
   va_end(args);
 
   fprintf(stderr, "%s\n", RESET);
+  fprintf(stderr, " %s%6d |%s", GRAY, where.first_line+1, RESET);
+  FOR(i, 0, where.first_column) fputc(' ', stderr);
+  fprintf(stderr, RED);
+  FOR(i, where.first_column, where.last_column) fputc('~', stderr);
+  fprintf(stderr, "^\n");
+  fprintf(stderr, RESET);
+
   fflush(stderr);
 }
 
 void yyerror(const char* msg) {
-  emitError(SYNTAX_ERROR, msg);
+  extern int yylineno;
+
+  emitError(
+    SYNTAX_ERROR, 
+    (YYLTYPE) {
+      .first_line = yylineno,
+      .last_line = yylineno,
+      .first_column = 0,
+      .last_line = 0
+    }, 
+    msg
+  );
 }

@@ -1,2 +1,4 @@
 
 errore fallback per cose non riconosciute dal lexer
+la prima tappa non può essere quella di partenza (potrebbe non avere senso semanticamente)
+in generale due tappe consecutive non possono essere identiche (potrebbe non avere senso semanticamente)

@@ -10,22 +10,22 @@ typedef enum {
 } ErrorType;
 
 typedef struct {
-  char* city_code;
-  char* city_name;
-  double x;
-  double y;
+  Token(char*) city_code;
+  Token(char*) city_name;
+  Token(double) x;
+  Token(double) y;
 } Sec1StmtContext;
 
 typedef struct {
-  int cyclist_code;
-  char* cyclist_name;
-  char* city_code;
+  Token(int) cyclist_code;
+  Token(char*) cyclist_name;
+  Token(char*) city_code;
 } Sec2StmtContext;
 
 typedef struct {
-  int cyclist_code;
-  char* city_code;
-  int seconds;
+  Token(int) cyclist_code;
+  Token(char*) city_code;
+  Token(int) seconds;
 } Sec3StmtContext;
 
 typedef struct Entry {
@@ -85,7 +85,8 @@ void visitSec1Stmt(Sec1StmtContext ctx);
 void visitSec2Stmt(Sec2StmtContext ctx);
 void visitSec3Stmt(Sec3StmtContext ctx);
 
-void emitError(ErrorType kind, const char* fmt, ...);
+void emitError(ErrorType kind, YYLTYPE where, const char* fmt, ...);
+void emitNote(YYLTYPE where, const char* fmt, ...);
 
 void compile(const char* input, const char* output);
 

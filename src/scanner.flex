@@ -3,6 +3,13 @@
 %{
   #include <string.h>
   #include "parser.h"
+  int yycolumn = 1;
+
+  #define YY_USER_ACTION \
+  yylloc.first_line = yylloc.last_line = yylineno; \
+  yylloc.first_column = yycolumn; \
+  yylloc.last_column = yycolumn + yyleng - 1; \
+  yycolumn += yyleng;
 %}
 
 /*
@@ -42,7 +49,6 @@ SECONDS "0"|{NON_ZERO_DIGIT}{DIGIT}*
 
 
 %%
-{ENDLINE} { return TK_ENDLINE; }
 {CITY_CODE} { yylval.as_string = strdup(yytext); return TK_CITY_CODE; }
 {CITY_NAME} { yylval.as_string = strndup(yytext+1, yyleng-2); return TK_CITY_NAME; }
 {COORDINATES} { yylval.as_double = atof(yytext); return TK_COORDINATES; }
@@ -54,5 +60,6 @@ SECONDS "0"|{NON_ZERO_DIGIT}{DIGIT}*
 {CYCLIST_SEP} { return TK_CYCLIST_SEP; }
 {SECTION_SEP} { return TK_SECTION_SEP; }
 {SECONDS} { yylval.as_int = atoi(yytext); return TK_SECONDS; } 
+{ENDLINE} { yycolumn = 1; return TK_ENDLINE; }
 . {}
 %%
