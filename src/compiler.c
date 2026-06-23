@@ -6,6 +6,8 @@
 #include "parser.h"
 #include "compiler.h"
 
+#define MAX_EDIT_DISTANCE 1
+
 static CompilationContext CONTEXT;
 
 CompilationContext* getCompilationContext() {
@@ -25,8 +27,8 @@ static void destructor() {
 
 #define CITY_REDECLARATION "Redeclaration of city \"%s\" with city code \"%s\".\n"
 #define CYCLIST_REDECLARATION "Redeclaration of cyclist #%d.\n"
-#define INVALID_CITY_CODE "No matching city with code \"%s\".\n"
-#define INVALID_CYCLIST_CODE "No matching cyclist with code #%d.\n"
+#define INVALID_CITY_CODE "No matching city with code \"%s\".%s\n"
+#define INVALID_CYCLIST_CODE "No matching cyclist with code #%d.%s\n"
 #define IDENTICAL_ADJACENT_CHECKPOINTS "In checkpoint declaration, the next checkpoint (reached by cyclist with code #%d) must be different from the previously reached \"%s\".\n"
 
 void translate(const char* path) {
@@ -101,7 +103,14 @@ void visitSec2Stmt(Sec2StmtContext ctx) {
   
   if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code.value)) {
     emitError(SEMANTIC_ERROR, ctx.city_code.where, "%s", ctx.city_code.value);
-    emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value);
+    const char* mostSimilar = mostSimilarCity(ctx.city_code.value, MAX_EDIT_DISTANCE);
+    if(mostSimilar != NULL) {
+      char buf[64];
+      memset(buf, 0, sizeof(buf));
+      snprintf(buf, sizeof(buf), " Did you mean city with code \"%s\"?", mostSimilar);
+      emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value, buf);
+    } else emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value, "");
+
     ok = 0;
   }
 
@@ -127,20 +136,37 @@ Vec2 toCoords(char* city_name) {
 }
 
 
+
 void visitSec3Stmt(Sec3StmtContext ctx) {
   // cyclist_code in [1, 1000] -> key in [0, 999]
   Symbol* symbol = lookup(&CONTEXT.symbol_table, ctx.cyclist_code.value-1);
 
   int ok = 1;
   if(symbol == NULL) {
-    emitError(SEMANTIC_ERROR, ctx.cyclist_code.where, "%d", ctx.cyclist_code.value);
-    emitNote(ctx.cyclist_code.where, INVALID_CYCLIST_CODE, ctx.cyclist_code.value);
     ok = 0;
+    emitError(SEMANTIC_ERROR, ctx.cyclist_code.where, "%d", ctx.cyclist_code.value);
+
+    int most_similar = mostSimilarCyclist(ctx.cyclist_code.value, MAX_EDIT_DISTANCE);
+    if(most_similar >= 0) {
+      char buf[40];
+      memset(buf, 0, sizeof(buf));
+      snprintf(buf, sizeof(buf), " Did you mean cyclist #%d?", most_similar);
+      emitNote(ctx.cyclist_code.where, INVALID_CYCLIST_CODE, ctx.cyclist_code.value, buf);
+    }
+    else emitNote(ctx.cyclist_code.where, INVALID_CYCLIST_CODE, ctx.cyclist_code.value, "");
   }
 
   if(!hashTableContains(&CONTEXT.hash_table, ctx.city_code.value)) {
     emitError(SEMANTIC_ERROR, ctx.city_code.where, "%s", ctx.city_code.value);
-    emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value);
+
+    const char* mostSimilar = mostSimilarCity(ctx.city_code.value, MAX_EDIT_DISTANCE);
+    if(mostSimilar != NULL) {
+      char buf[64];
+      memset(buf, 0, sizeof(buf));
+      snprintf(buf, sizeof(buf), " Did you mean city with code \"%s\"?", mostSimilar);
+      emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value, buf);
+    } else emitNote(ctx.city_code.where, INVALID_CITY_CODE, ctx.city_code.value, "");
+
     ok = 0;
   }
 
@@ -167,4 +193,86 @@ void visitSec3Stmt(Sec3StmtContext ctx) {
     symbol->total_distance += 1000 * sqrt(pow(end.y - begin.y, 2) + pow(end.x - begin.x, 2));
     symbol->total_time += ctx.seconds.value;
   }
+}
+
+int editDistance(const char* s1, const char* s2) {
+  #define __EDIST_SUB_COST__(x, y) ((x) != (y))
+  #define __EDIST_DEL_COST__(c) (1)
+  #define __EDIST_INS_COST__(c) (1)
+  #define __EDIST_AT__(i, j) (i)*h+(j)
+  #define __EDIST_MIN2__(x, y) (x) < (y) ? (x) : (y)
+  #define __EDIST_MIN3__(x, y, z) __EDIST_MIN2__((x), __EDIST_MIN2__((y), (z)))
+
+  int w = strlen(s1)+1;
+  int h = strlen(s2)+1;
+
+  int* A = (int*)calloc(w*h, sizeof(int));
+
+  for(int i = 1; i < w; ++i)
+    A[__EDIST_AT__(i, 0)] = A[__EDIST_AT__(i-1, 0)] + __EDIST_DEL_COST__(s1[i-1]);
+
+  for(int j = 1; j < h; ++j) {
+    A[__EDIST_AT__(0, j)] = A[__EDIST_AT__(0, j-1)] + __EDIST_INS_COST__(s2[j-1]);
+  }
+
+  for(int i = 1; i < w; ++i) {
+    for(int j = 1; j < h; ++j) {
+      A[__EDIST_AT__(i, j)] = __EDIST_MIN3__(
+        A[__EDIST_AT__(i-1, j-1)] + __EDIST_SUB_COST__(s1[i-1], s2[j-1]),
+        A[__EDIST_AT__(i-1, j)] + __EDIST_DEL_COST__(s1[i-1]),
+        A[__EDIST_AT__(i, j-1)] + __EDIST_INS_COST__(s2[j-1])
+      );
+    }
+  }
+
+  int result = A[w*h-1];
+  free(A);
+  return result;
+  
+  #undef __EDIST_SUB_COST__
+  #undef __EDIST_DEL_COST__
+  #undef __EDIST_INS_COST__
+  #undef __EDIST_AT__
+  #undef __EDIST_MIN2__
+  #undef __EDIST_MIN3__
+  
+}
+
+
+int mostSimilarCyclist(int code, int threshold) {
+  code = code - 1;
+  for(int i = 0; i < 1000; i++) {
+    if(i == code || lookup(&CONTEXT.symbol_table, i) == NULL) continue;
+
+    char buf1[5];
+    char buf2[5];
+    memset(buf1, 0, sizeof(buf1));
+    memset(buf2, 0, sizeof(buf2));
+  
+    snprintf(buf1, 5, "%d", code);
+    snprintf(buf2, 5, "%d", i);
+  
+    int dist = editDistance(buf1, buf2);
+    if(dist <= threshold) return i+1;
+  }
+
+  return -1;
+}
+
+const char* mostSimilarCity(const char* city, int threshold) {
+  
+  for(int i = 0; i < CONTEXT.hash_table.capacity; ++i) {
+    Entry* list = CONTEXT.hash_table.entries[i];
+
+    while(list != NULL) {
+      const char* other = list->city_code;
+      if(strcmp(other, city) == 0) continue;
+    
+      int dist = editDistance(city, other);
+      if(dist <= threshold) return other;
+      list = list->next;
+    }
+  }
+
+  return NULL;
 }

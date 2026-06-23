@@ -70,7 +70,10 @@ typedef struct {
 
 CompilationContext* getCompilationContext();
 
+
+int editDistance(const char* s1, const char* s2);
 Vec2 toCoords(char* city_name);
+
 
 Symbol* lookup(SymbolTable* self, Key key);
 Symbol* insert(SymbolTable* self, Key key, Symbol symbol);
@@ -97,3 +100,5 @@ int reportSyntaxError(const void* yyctx);
 
 void compile(const char* input, const char* output);
 
+int mostSimilarCyclist(int code, int threshold);
+const char* mostSimilarCity(const char* city, int threshold);
