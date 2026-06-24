@@ -1,7 +1,0 @@
-267, Francesco Tocco <Roma, Bari> 7.15380
-288, Emilio Perrotti <Roma, Trapani> 26.47028
-433, Riccardo Ritchie <Cefalu, Trapani> 19.76672
-681, Gianmarco Stark <Roma, Roma> 0.00000
-733, Tony Marzano <Trapani, Trapani> 6.78392
-784, Maria Kirby <Cefalu, Bari> 27.54324
-909, Dennis Marzano <Cefalu, Cefalu> 8.66457
