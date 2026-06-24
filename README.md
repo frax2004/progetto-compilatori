@@ -104,7 +104,7 @@ La funzione **yypcontext_expected_tokens(ctx, buffer, N)** prende a parametri:
 - un buffer di interi dove scrivere l'insieme dei token attesi
 - la lunghezza del buffer dei token attesi
 
-Per lunghezza del buffer basterebbe che **N** $= argmax_a|follow(a \in \Sigma \cup V)|$.
+Per lunghezza del buffer basterebbe che **N** $= argmax_X|follow(X \in V)|$.
 Nel caso della nostra grammatica basterebbe una lunghezza massima di $2$.
 
 Il nostro strumento mette a disposizione tipologie di errori per la diagnostica:
