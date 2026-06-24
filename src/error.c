@@ -22,7 +22,6 @@
 #define FOR(i, a, b) for(int i = a; i < b; ++i)
 
 #define MAX_EXPECTED_TOKENS_COUNT 8
-#define MAX_SYMBOL_LENGTH 32
 
 const char* ErrorTypeToString(ErrorType kind) {
   switch(kind) {
